@@ -15,6 +15,7 @@ extern crate toml;
 extern crate walkdir;
 extern crate zip;
 
+pub mod addon_path;
 pub mod addons;
 pub mod api;
 pub mod config;

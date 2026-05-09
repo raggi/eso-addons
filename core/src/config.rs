@@ -1,3 +1,4 @@
+use crate::addon_path;
 use crate::error::{self, Result};
 use serde::ser::SerializeStruct;
 use serde_derive::{Deserialize, Serialize};
@@ -11,17 +12,6 @@ use tracing::log::info;
 pub const EAM_DATA_DIR: &str = "eso-addons";
 pub const EAM_CONF: &str = "config.json";
 pub const EAM_DB: &str = "addons.db";
-
-const STEAMDECK_DEFAULT_ADDON_DIR: &str = ".local/share/Steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/My Documents/Elder Scrolls Online/live/AddOns";
-
-#[cfg(target_os = "linux")]
-const DEFAULT_ADDON_DIR: &str = "drive_c/users/user/My Documents/Elder Scrolls Online/live/AddOns";
-
-#[cfg(target_os = "macos")]
-const DEFAULT_ADDON_DIR: &str = "drive_c/users/user/My Documents/Elder Scrolls Online/live/AddOns";
-
-#[cfg(target_os = "windows")]
-const DEFAULT_ADDON_DIR: &str = "Documents/Elder Scrolls Online/live/AddOns";
 
 // service crate version
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -187,16 +177,9 @@ fn default_version() -> String {
 }
 
 fn default_addon_dir() -> PathBuf {
-    dirs::home_dir().unwrap().join(DEFAULT_ADDON_DIR)
+    addon_path::best_default()
 }
 
 pub fn detect_addon_dir() -> PathBuf {
-    let addon_dir = dirs::home_dir().unwrap();
-    for ext_path in [STEAMDECK_DEFAULT_ADDON_DIR, DEFAULT_ADDON_DIR] {
-        let path_opt = addon_dir.join(ext_path);
-        if path_opt.exists() {
-            return path_opt;
-        }
-    }
-    addon_dir
+    addon_path::best_default()
 }
